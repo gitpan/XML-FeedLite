@@ -1,0 +1,18 @@
+--- #YAML:1.0
+name:                XML-FeedLite
+version:             1.004
+abstract:            Perl extension for fetching Atom and RSS feeds with minimal outlay
+license:             ~
+generated_by:        ExtUtils::MakeMaker version 6.32
+distribution_type:   module
+requires:     
+    HTML::Entities:                
+    HTTP::Headers:                 
+    HTTP::Request:                 
+    LWP::Parallel::UserAgent:      
+    MIME::Base64:                  
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - Roger Pettett <rmp@psyphi.net>

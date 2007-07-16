@@ -1,18 +1,20 @@
+Changes
+lib/XML/FeedLite/File.pm
 lib/XML/FeedLite/Normalised.pm
 lib/XML/FeedLite/UserAgent.pm
-lib/XML/FeedLite/File.pm
 lib/XML/FeedLite.pm
-MANIFEST
 Makefile.PL
+MANIFEST
+README
 t/00-distribution.t
 t/01-podcoverage.t
-t/example-rss-2.0
-t/example-rss-1.0
-t/10-rss2.t
 t/10-atom.t
 t/10-rss.t
+t/10-rss2.t
+t/20-titles.t
 t/example-1-atom-1.0
 t/example-2-atom-1.0
 t/example-3-atom-1.0
-README
-Changes
+t/example-rss-1.0
+t/example-rss-2.0
+META.yml                                 Module meta-data (added by MakeMaker)
