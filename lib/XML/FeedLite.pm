@@ -2,8 +2,8 @@
 # Author:        rmp@psyphi.net
 # Maintainer:    rmp@psyphi.net
 # Created:       2006-06-08
-# Last Modified: $Date: 2007/07/16 21:31:47 $
-# Id:            $Id: FeedLite.pm,v 1.5 2007/07/16 21:31:47 zerojinx Exp $
+# Last Modified: $Date: 2007/07/18 10:36:21 $
+# Id:            $Id: FeedLite.pm,v 1.6 2007/07/18 10:36:21 zerojinx Exp $
 # Source:        $Source: /cvsroot/xml-feedlite/xml-feedlite/lib/XML/FeedLite.pm,v $
 # $HeadURL$
 #
@@ -18,7 +18,7 @@ use MIME::Base64;
 use English qw(-no_match_vars);
 use Carp;
 
-our $VERSION  = do { my @r = (q$Revision: 1.5 $ =~ /\d+/mxg); sprintf '%d.'.'%03d' x $#r, @r };
+our $VERSION  = do { my @r = (q$Revision: 1.6 $ =~ /\d+/mxg); sprintf '%d.'.'%03d' x $#r, @r };
 our $DEBUG    = 0;
 our $BLK_SIZE = 8192;
 our $TIMEOUT  = 30;
@@ -71,6 +71,8 @@ sub http_proxy {
     $self->{'http_proxy'} ||= $ENV{'http_proxy'};
     $self->{'_checked_http_proxy_env'} = 1;
   }
+
+  $self->{'http_proxy'} ||= q();
 
   if($self->{'http_proxy'} =~ m|^(https?://)(\S+):(.*?)\@(.*?)$|mx) {
     #########
@@ -359,7 +361,7 @@ XML::FeedLite - Perl extension for fetching Atom and RSS feeds with minimal outl
 
 =head1 VERSION
 
-$Revision: 1.5 $
+$Revision: 1.6 $
 
 =head1 SYNOPSIS
 

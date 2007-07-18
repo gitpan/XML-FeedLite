@@ -1,14 +1,14 @@
 --- #YAML:1.0
 name:                XML-FeedLite
-version:             1.004
+version:             1.006
 abstract:            Perl extension for fetching Atom and RSS feeds with minimal outlay
-license:             ~
+license:             perl
 generated_by:        ExtUtils::MakeMaker version 6.32
 distribution_type:   module
 requires:     
     HTML::Entities:                
-    HTTP::Headers:                 
-    HTTP::Request:                 
+    HTTP::Headers:                 1.64
+    HTTP::Request:                 1.4
     LWP::Parallel::UserAgent:      
     MIME::Base64:                  
 meta-spec:
