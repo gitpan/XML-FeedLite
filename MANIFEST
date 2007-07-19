@@ -1,12 +1,16 @@
 Changes
+examples/fetch_multi
 lib/XML/FeedLite/File.pm
 lib/XML/FeedLite/Normalised.pm
+lib/XML/FeedLite/UserAgent/proxy.pm
 lib/XML/FeedLite/UserAgent.pm
 lib/XML/FeedLite.pm
 Makefile.PL
 MANIFEST
 README
+t/00-critic.t
 t/00-distribution.t
+t/00-pod.t
 t/01-podcoverage.t
 t/10-atom.t
 t/10-rss.t

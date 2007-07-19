@@ -2,8 +2,8 @@
 # Author:        rmp@psyphi.net
 # Maintainer:    rmp@psyphi.net
 # Created:       2006-06-08
-# Last Modified: $Date: 2007/07/18 10:36:21 $
-# Id:            $Id: FeedLite.pm,v 1.6 2007/07/18 10:36:21 zerojinx Exp $
+# Last Modified: $Date: 2007/07/19 11:57:49 $
+# Id:            $Id: FeedLite.pm,v 1.7 2007/07/19 11:57:49 zerojinx Exp $
 # Source:        $Source: /cvsroot/xml-feedlite/xml-feedlite/lib/XML/FeedLite.pm,v $
 # $HeadURL$
 #
@@ -18,7 +18,7 @@ use MIME::Base64;
 use English qw(-no_match_vars);
 use Carp;
 
-our $VERSION  = do { my @r = (q$Revision: 1.6 $ =~ /\d+/mxg); sprintf '%d.'.'%03d' x $#r, @r };
+our $VERSION  = do { my @r = (q$Revision: 1.7 $ =~ /\d+/mxg); sprintf '%d.'.'%03d' x $#r, @r };
 our $DEBUG    = 0;
 our $BLK_SIZE = 8192;
 our $TIMEOUT  = 30;
@@ -361,7 +361,7 @@ XML::FeedLite - Perl extension for fetching Atom and RSS feeds with minimal outl
 
 =head1 VERSION
 
-$Revision: 1.6 $
+$Revision: 1.7 $
 
 =head1 SYNOPSIS
 
@@ -406,17 +406,17 @@ under mod_perl. This module requires LWP::Parallel::UserAgent.
 
   This is only required if the username wasn't specified when setting http_proxy
 
-    $xfl->proxy_user("myusername");
+    $xfl->proxy_user('myusername');
 
 =head2 proxy_pass - Get/Set proxy password for authenticating forward-proxies
 
   This is only required if the password wasn't specified when setting http_proxy
 
-    $xfl->proxy_pass("secretpassword");
+    $xfl->proxy_pass('secretpassword');
 
 =head2 user_agent - Get/Set user-agent for request headers
 
-    $xfl->user_agent("Feedtastic/1.0");
+    $xfl->user_agent('Feedtastic/1.0');
 
 =head2 timeout - Get/Set timeout
 
@@ -424,11 +424,11 @@ under mod_perl. This module requires LWP::Parallel::UserAgent.
 
 =head2 url - Get/Set DSN
 
-  $xfl->url("http://das.ensembl.org/das/ensembl1834/"); # give url (scalar or arrayref) here if not specified in new()
+  $xfl->url('http://das.ensembl.org/das/ensembl1834/'); # give url (scalar or arrayref) here if not specified in new()
 
   Or, if you want to add to the existing url list and you're feeling sneaky...
 
-  push @{$xfl->url}, "http://my.server/das/additionalsource";
+  push @{$xfl->url}, 'http://my.server/das/additionalsource';
 
 =head2 reset - Flush bufers, reset flags etc.
 
@@ -441,7 +441,7 @@ under mod_perl. This module requires LWP::Parallel::UserAgent.
 =head2 meta - Meta data globally keyed on feed, or for a given feed 
 
   my $hrMeta     = $xfl->meta();
-  my $hrFeedMeta = $xfl->meta("http://mysite.com/feed.xml");
+  my $hrFeedMeta = $xfl->meta('http://mysite.com/feed.xml');
 
 =head2 title - The name/title of a given feed
 
