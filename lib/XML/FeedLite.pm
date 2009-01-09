@@ -2,8 +2,8 @@
 # Author:        rmp@psyphi.net
 # Maintainer:    rmp@psyphi.net
 # Created:       2006-06-08
-# Last Modified: $Date: 2007/07/19 11:57:49 $
-# Id:            $Id: FeedLite.pm,v 1.7 2007/07/19 11:57:49 zerojinx Exp $
+# Last Modified: $Date: 2009/01/09 14:38:54 $
+# Id:            $Id: FeedLite.pm,v 1.8 2009/01/09 14:38:54 zerojinx Exp $
 # Source:        $Source: /cvsroot/xml-feedlite/xml-feedlite/lib/XML/FeedLite.pm,v $
 # $HeadURL$
 #
@@ -17,23 +17,25 @@ use HTML::Entities;
 use MIME::Base64;
 use English qw(-no_match_vars);
 use Carp;
+use Readonly;
 
-our $VERSION  = do { my @r = (q$Revision: 1.7 $ =~ /\d+/mxg); sprintf '%d.'.'%03d' x $#r, @r };
+our $VERSION  = do { my @r = (q$Revision: 1.8 $ =~ /\d+/smxg); sprintf '%d.'.'%03d' x $#r, @r };
 our $DEBUG    = 0;
-our $BLK_SIZE = 8192;
-our $TIMEOUT  = 30;
-our $MAX_REQ  = 5;
+Readonly::Scalar our $BLK_SIZE => 8192;
+Readonly::Scalar our $TIMEOUT  => 30;
+Readonly::Scalar our $MAX_REQ  => 5;
+
 our $PATTERNS = {
 		 'ENTRIES' => {
-			       'atom' => qr!<entry[^>]*>(.*?)</entry>!smix,
-			       'rss'  => qr!<item(?:\ [^>]*|)>(.*?)</item>!smix,
+			       'atom' => qr{<entry[^>]*>(.*?)</entry>}smix,
+			       'rss'  => qr{<item(?:\ [^>]*|)>(.*?)</item>}smix,
 			      },
 		 'META'    => {
 			       'atom' => {
-					  'title' => qr!<feed.*?<title[^>]*>(.*?)</title>!smix,
+					  'title' => qr{<feed.*?<title[^>]*>(.*?)</title>}smix,
 					 },
 			       'rss'  => {
-					  'title' => qr!<channel.*?<title[^>]*>(.*?)</title.*?</channel>!smix,
+					  'title' => qr{<channel.*?<title[^>]*>(.*?)</title.*?</channel>}smix,
 					 },
 			      },
 		};
@@ -74,7 +76,7 @@ sub http_proxy {
 
   $self->{'http_proxy'} ||= q();
 
-  if($self->{'http_proxy'} =~ m|^(https?://)(\S+):(.*?)\@(.*?)$|mx) {
+  if($self->{'http_proxy'} =~ m{^(https?://)(\S+):(.*?)\@(.*?)$}smx) {
     #########
     # http_proxy contains username & password - we'll set them up here:
     #
@@ -94,23 +96,23 @@ sub _accessor {
 }
 
 sub proxy_user {
-  my $self = shift;
-  return $self->_accessor('proxy_user', @_);
+  my ($self, @args) = @_;
+  return $self->_accessor('proxy_user', @args);
 }
 
 sub proxy_pass {
-  my $self = shift;
-  return $self->_accessor('proxy_pass', @_);
+  my ($self, @args) = @_;
+  return $self->_accessor('proxy_pass', @args);
 }
 
 sub user_agent {
-  my $self = shift;
-  return $self->_accessor('user_agent', @_) || "XML::FeedLite v$VERSION";
+  my ($self, @args) = @_;
+  return $self->_accessor('user_agent', @args) || "XML::FeedLite v$VERSION";
 }
 
 sub timeout {
-  my $self = shift;
-  return $self->_accessor('timeout', @_);
+  my ($self, @args) = @_;
+  return $self->_accessor('timeout', @args);
 }
 
 sub url {
@@ -173,22 +175,25 @@ sub entries {
       $self->{'data'}->{$s_url} .= $blk;
 
       if(!$self->{'format'}->{$s_url}) {
-	if($blk =~ m|xmlns="https?://[a-z\d\.\-/]+/atom|mix) {
+	if($blk =~ m{xmlns="https?://[a-z\d\.\-/]+/atom}smix) {
 	  $self->{'format'}->{$s_url} = 'atom';
 
-	} elsif($blk =~ m|xmlns="https?://[a-z\d\.\-/]+/rss|mix) {
+	} elsif($blk =~ m{xmlns="https?://[a-z\d\.\-/]+/rss}smix) {
 	  $self->{'format'}->{$s_url} = 'rss';
 
-	} elsif($blk =~ m|rss\s+version\s*=\s*"2.0"|mix) {
+	} elsif($blk =~ m{rss\s+version\s*=\s*"2.0"}smix) {
 	  $self->{'format'}->{$s_url} = 'rss';
 	}
       }
 
       my $feedmeta = $self->{'feedmeta'}->{$s_url};
       for my $f (keys %{$PATTERNS->{'META'}->{$self->{'format'}->{$s_url}}}) {
-	next if($feedmeta->{$f});
+	if($feedmeta->{$f}) {
+	  next;
+	}
+
 	my $pat = $PATTERNS->{'META'}->{$self->{'format'}->{$s_url}}->{$f};
-	($feedmeta->{$f}) = $blk =~ /$pat/mx;
+	($feedmeta->{$f}) = $blk =~ /$pat/smx;
       }
 
       my $pat = $PATTERNS->{'ENTRIES'}->{$self->{'format'}->{$s_url}};
@@ -197,7 +202,7 @@ sub entries {
 	return;
       }
 
-      while($self->{'data'}->{$s_url} =~ s/$pat//mx) {
+      while($self->{'data'}->{$s_url} =~ s/$pat//smx) {
 	$self->_parse_entry($results->{$s_url}, $1);
       }
       return;
@@ -217,8 +222,8 @@ sub _parse_entry {
   my $entry = {};
   $blk    ||= q();
 
-  my $pat = qr!(<([a-z:]+)([^>]*)>(.*?)</\2>|<([a-z:]+)([^>]*)/>)!smix;
-  while($blk =~ s|$pat||mx) {
+  my $pat = qr{(<([a-z:]+)([^>]*)>(.*?)</\2>|<([a-z:]+)([^>]*)/>)}smix;
+  while($blk =~ s{$pat}{}smx) {
 
     my ($tag, $attr, $content);
     if($4) {
@@ -231,7 +236,7 @@ sub _parse_entry {
     my $tagdata   = {};
     $attr       ||= q();
 
-    while($attr =~ s|(\S+)\s*=\s*["']([^"']*)["']||smx) {
+    while($attr =~ s{(\S+)\s*=\s*["']([^"']*)["']}{}smx) {
       if($2) {
 	$tagdata->{$1} = $2;
       }
@@ -317,14 +322,17 @@ sub fetch {
   $DEBUG and print {*STDERR} qq(Requests submitted. Waiting for content\n);
   eval {
     $self->{'ua'}->wait($self->{'timeout'});
+    1;
+  } or do {
+    if($EVAL_ERROR) {
+      carp $EVAL_ERROR;
+    }
   };
 
-  if($EVAL_ERROR) {
-    carp $EVAL_ERROR;
-  }
-
   for my $url (keys %{$url_ref}) {
-    next if(ref $url_ref->{$url} ne 'CODE');
+    if(ref $url_ref->{$url} ne 'CODE') {
+      next;
+    }
 
     $self->{'statuscodes'}->{$url} ||= '200';
   }
@@ -348,8 +356,8 @@ sub statuscodes {
 }
 
 sub max_req {
-  my $self = shift;
-  return $self->_accessor('max_req', @_);
+  my ($self, @args) = @_;
+  return $self->_accessor('max_req', @args);
 }
 
 1;
@@ -361,7 +369,7 @@ XML::FeedLite - Perl extension for fetching Atom and RSS feeds with minimal outl
 
 =head1 VERSION
 
-$Revision: 1.7 $
+$Revision: 1.8 $
 
 =head1 SYNOPSIS
 

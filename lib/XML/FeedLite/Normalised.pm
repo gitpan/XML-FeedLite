@@ -2,8 +2,8 @@
 # Author:        rmp@psyphi.net
 # Maintainer:    rmp@psyphi.net
 # Created:       2006-06-08
-# Last Modified: $Date: 2007/07/16 21:31:47 $
-# Id:            $Id: Normalised.pm,v 1.3 2007/07/16 21:31:47 zerojinx Exp $
+# Last Modified: $Date: 2009/01/09 14:38:54 $
+# Id:            $Id: Normalised.pm,v 1.4 2009/01/09 14:38:54 zerojinx Exp $
 # Source:        $Source: /cvsroot/xml-feedlite/xml-feedlite/lib/XML/FeedLite/Normalised.pm,v $
 # $HeadURL$
 #
@@ -12,16 +12,16 @@ use strict;
 use warnings;
 use base qw(XML::FeedLite);
 
-our $VERSION  = do { my @r = (q$Revision: 1.3 $ =~ /\d+/mxg); sprintf '%d.'.'%03d' x $#r, @r };
+our $VERSION  = do { my @r = (q$Revision: 1.4 $ =~ /\d+/smxg); sprintf '%d.'.'%03d' x $#r, @r };
 
 sub entries {
-  my $self    = shift;
-  my $rawdata = $self->SUPER::entries(@_);
+  my ($self, @args) = @_;
+  my $rawdata = $self->SUPER::entries(@args);
 
   for my $feed (keys %{$self->{'format'}}) {
     my $format = $self->{'format'}->{$feed};
 
-    if($format !~ /^(atom|rss)/mx) {
+    if($format !~ /^(atom|rss)/smx) {
       next;
     }
 
@@ -68,9 +68,11 @@ __END__
 
 =head1 NAME
 
+XML::FeedLite::Normalised
+
 =head1 VERSION
 
-$Revision: 1.3 $
+$Revision: 1.4 $
 
 =head1 SYNOPSIS
 

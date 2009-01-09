@@ -1,13 +1,12 @@
 Changes
-examples/fetch_multi
-lib/XML/FeedLite/File.pm
-lib/XML/FeedLite/Normalised.pm
-lib/XML/FeedLite/UserAgent/proxy.pm
-lib/XML/FeedLite/UserAgent.pm
-lib/XML/FeedLite.pm
-Makefile.PL
 MANIFEST
 README
+examples/fetch-multi.pl
+examples/fetch-rdf.pl
+lib/XML/FeedLite.pm
+lib/XML/FeedLite/File.pm
+lib/XML/FeedLite/Normalised.pm
+lib/XML/FeedLite/UserAgent.pm
 t/00-critic.t
 t/00-distribution.t
 t/00-pod.t
@@ -21,4 +20,6 @@ t/example-2-atom-1.0
 t/example-3-atom-1.0
 t/example-rss-1.0
 t/example-rss-2.0
-META.yml                                 Module meta-data (added by MakeMaker)
+Makefile.PL
+Build.PL
+META.yml

@@ -22,8 +22,5 @@ To install this module type the following:
 
 DEPENDENCIES
 
-LWP::Parallel::UserAgent
-HTTP::Request
-HTTP::Headers
-HTML::Entities
-MIME::Base64
+See Build.PL
+

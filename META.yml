@@ -1,18 +1,37 @@
---- #YAML:1.0
-name:                XML-FeedLite
-version:             1.007
-abstract:            Perl extension for fetching Atom and RSS feeds with minimal outlay
-license:             perl
-generated_by:        ExtUtils::MakeMaker version 6.32
-distribution_type:   module
-requires:     
-    HTML::Entities:                
-    HTTP::Headers:                 1.64
-    HTTP::Request:                 1.4
-    LWP::Parallel::UserAgent:      
-    MIME::Base64:                  
-meta-spec:
-    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
-    version: 1.2
+---
+name: XML-FeedLite
+version: 1.008
 author:
-    - Roger Pettett <rmp@psyphi.net>
+  - 'Roger M Pettett <rpettett@cpan.org>'
+abstract: 'XML::FeedLite - A simple RSS & Atom feed processor'
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  HTML::Entities: 1.35
+  HTTP::Headers: 1.64
+  HTTP::Request: 1.40
+  LWP::Parallel::UserAgent: 0
+  MIME::Base64: 3.07_01
+  Readonly: 1.03
+build_requires:
+  Test::Distribution: 0
+  Test::More: 0.8
+  Test::Perl::Critic: 0
+provides:
+  XML::FeedLite:
+    file: lib/XML/FeedLite.pm
+    version: 1.008
+  XML::FeedLite::File:
+    file: lib/XML/FeedLite/File.pm
+    version: 1.003
+  XML::FeedLite::Normalised:
+    file: lib/XML/FeedLite/Normalised.pm
+    version: 1.004
+  XML::FeedLite::UserAgent:
+    file: lib/XML/FeedLite/UserAgent.pm
+    version: 1.003
+generated_by: Module::Build version 0.280801
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

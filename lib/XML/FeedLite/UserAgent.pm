@@ -2,8 +2,8 @@
 # Author:        rmp@psyphi.net
 # Maintainer:    rmp@psyphi.net
 # Created:       2006-06-08
-# Last Modified: $Date: 2007/07/16 21:31:47 $
-# Id:            $Id: UserAgent.pm,v 1.2 2007/07/16 21:31:47 zerojinx Exp $
+# Last Modified: $Date: 2009/01/09 14:38:54 $
+# Id:            $Id: UserAgent.pm,v 1.3 2009/01/09 14:38:54 zerojinx Exp $
 # Source:        $Source: /cvsroot/xml-feedlite/xml-feedlite/lib/XML/FeedLite/UserAgent.pm,v $
 # $HeadURL$
 #
@@ -14,7 +14,7 @@ use LWP::Parallel::UserAgent;
 use base qw(LWP::Parallel::UserAgent);
 use XML::FeedLite::UserAgent::proxy;
 
-our $VERSION  = do { my @r = (q$Revision: 1.2 $ =~ /\d+/mxg); sprintf '%d.'.'%03d' x $#r, @r };
+our $VERSION  = do { my @r = (q$Revision: 1.3 $ =~ /\d+/smxg); sprintf '%d.'.'%03d' x $#r, @r };
 
 sub new {
   my ($class, %args) = @_;
@@ -27,7 +27,7 @@ sub new {
 sub _need_proxy {
   my $self = shift;
   $self->{'http_proxy'} or return;
-  my ($scheme, $host, $port) = $self->{'http_proxy'} =~ m|(https?)://([^:\#\?/]+):?(\d+)?|mx;
+  my ($scheme, $host, $port) = $self->{'http_proxy'} =~ m{(https?)://([^:\#\?/]+):?(\d+)?}smx;
   $host or return;
   my $proxy = {
 	       'host'   => $host,
@@ -46,7 +46,8 @@ sub on_failure {
 }
 
 sub on_return {
-  return on_failure(@_);
+  my @args = @_;
+  return on_failure(@args);
 }
 
 sub statuscodes {
@@ -61,9 +62,11 @@ __END__
 
 =head1 NAME
 
+XML::FeedLite::UserAgent
+
 =head1 VERSION
 
-$Revision: 1.2 $
+$Revision: 1.3 $
 
 =head1 SYNOPSIS
 

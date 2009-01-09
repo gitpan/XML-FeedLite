@@ -2,8 +2,8 @@
 # Author:        rmp@psyphi.net
 # Maintainer:    rmp@psyphi.net
 # Created:       2006-06-08
-# Last Modified: $Date: 2007/07/16 21:31:47 $
-# Id:            $Id: File.pm,v 1.2 2007/07/16 21:31:47 zerojinx Exp $
+# Last Modified: $Date: 2009/01/09 14:38:54 $
+# Id:            $Id: File.pm,v 1.3 2009/01/09 14:38:54 zerojinx Exp $
 # Source:        $Source: /cvsroot/xml-feedlite/xml-feedlite/lib/XML/FeedLite/File.pm,v $
 # $HeadURL$
 #
@@ -14,7 +14,7 @@ use base qw(XML::FeedLite);
 use English qw(-no_match_vars);
 use Carp;
 
-our $VERSION  = do { my @r = (q$Revision: 1.2 $ =~ /\d+/mxg); sprintf '%d.'.'%03d' x $#r, @r };
+our $VERSION = do { my @r = (q$Revision: 1.3 $ =~ /\d+/smxg); sprintf '%d.'.'%03d' x $#r, @r };
 
 sub fetch {
   my ($self, $url_ref) = @_;
@@ -41,9 +41,11 @@ __END__
 
 =head1 NAME
 
+XML::FeedLite::File
+
 =head1 VERSION
 
-$Revision: 1.2 $
+$Revision: 1.3 $
 
 =head1 SYNOPSIS
 
