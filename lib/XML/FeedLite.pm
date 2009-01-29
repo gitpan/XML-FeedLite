@@ -2,8 +2,8 @@
 # Author:        rmp@psyphi.net
 # Maintainer:    rmp@psyphi.net
 # Created:       2006-06-08
-# Last Modified: $Date: 2009/01/09 14:38:54 $
-# Id:            $Id: FeedLite.pm,v 1.8 2009/01/09 14:38:54 zerojinx Exp $
+# Last Modified: $Date: 2009/01/29 15:40:33 $
+# Id:            $Id: FeedLite.pm,v 1.9 2009/01/29 15:40:33 zerojinx Exp $
 # Source:        $Source: /cvsroot/xml-feedlite/xml-feedlite/lib/XML/FeedLite.pm,v $
 # $HeadURL$
 #
@@ -19,7 +19,7 @@ use English qw(-no_match_vars);
 use Carp;
 use Readonly;
 
-our $VERSION  = do { my @r = (q$Revision: 1.8 $ =~ /\d+/smxg); sprintf '%d.'.'%03d' x $#r, @r };
+our $VERSION  = do { my @r = (q$Revision: 1.9 $ =~ /\d+/smxg); sprintf '%d.'.'%03d' x $#r, @r };
 our $DEBUG    = 0;
 Readonly::Scalar our $BLK_SIZE => 8192;
 Readonly::Scalar our $TIMEOUT  => 30;
@@ -67,26 +67,26 @@ sub new {
 
 sub http_proxy {
   my ($self, $proxy)    = @_;
-  $proxy and $self->{'http_proxy'} = $proxy;
+  $proxy and $self->{http_proxy} = $proxy;
 
   if(!$self->{'_checked_http_proxy_env'}) {
-    $self->{'http_proxy'} ||= $ENV{'http_proxy'};
+    $self->{http_proxy} ||= $ENV{http_proxy};
     $self->{'_checked_http_proxy_env'} = 1;
   }
 
-  $self->{'http_proxy'} ||= q();
+  $self->{http_proxy} ||= q();
 
-  if($self->{'http_proxy'} =~ m{^(https?://)(\S+):(.*?)\@(.*?)$}smx) {
+  if($self->{http_proxy} =~ m{^(https?://)(\S+):(.*?)\@(.*?)$}smx) {
     #########
     # http_proxy contains username & password - we'll set them up here:
     #
     $self->proxy_user($2);
     $self->proxy_pass($3);
 
-    $self->{'http_proxy'} = "$1$4";
+    $self->{http_proxy} = "$1$4";
   }
 
-  return $self->{'http_proxy'};
+  return $self->{http_proxy};
 }
 
 sub _accessor {
@@ -122,29 +122,29 @@ sub url {
     $self->reset();
 
     if(ref $url eq 'ARRAY') {
-      $self->{'url'} = $url;
+      $self->{url} = $url;
 
     } else {
-      $self->{'url'} = [$url];
+      $self->{url} = [$url];
     }
   }
 
-  return $self->{'url'};
+  return $self->{url};
 }
 
 sub reset { ## no critic
   my $self = shift;
-  delete $self->{'results'};
-  delete $self->{'feedmeta'};
-  delete $self->{'data'};
+  delete $self->{results};
+  delete $self->{feedmeta};
+  delete $self->{data};
   return;
 }
 
 sub entries {
   my ($self, $url, $opts) = @_;
 
-  if(exists $self->{'results'}) {
-    return $self->{'results'};
+  if(exists $self->{results}) {
+    return $self->{results};
   }
 
   my $results   = {};
@@ -167,53 +167,53 @@ sub entries {
     #########
     # loop over urls to fetch
     #
-    $results->{$s_url}            = [];
-    $self->{'feedmeta'}->{$s_url} = {};
+    $results->{$s_url}          = [];
+    $self->{feedmeta}->{$s_url} = {};
 
     $ref->{$s_url} = sub {
       my $blk = shift;
-      $self->{'data'}->{$s_url} .= $blk;
+      $self->{data}->{$s_url} .= $blk;
 
-      if(!$self->{'format'}->{$s_url}) {
+      if(!$self->{format}->{$s_url}) {
 	if($blk =~ m{xmlns="https?://[a-z\d\.\-/]+/atom}smix) {
-	  $self->{'format'}->{$s_url} = 'atom';
+	  $self->{format}->{$s_url} = 'atom';
 
 	} elsif($blk =~ m{xmlns="https?://[a-z\d\.\-/]+/rss}smix) {
-	  $self->{'format'}->{$s_url} = 'rss';
+	  $self->{format}->{$s_url} = 'rss';
 
 	} elsif($blk =~ m{rss\s+version\s*=\s*"2.0"}smix) {
-	  $self->{'format'}->{$s_url} = 'rss';
+	  $self->{format}->{$s_url} = 'rss';
 	}
       }
 
-      my $feedmeta = $self->{'feedmeta'}->{$s_url};
-      for my $f (keys %{$PATTERNS->{'META'}->{$self->{'format'}->{$s_url}}}) {
+      my $feedmeta = $self->{feedmeta}->{$s_url};
+      for my $f (keys %{$PATTERNS->{META}->{$self->{format}->{$s_url}}}) {
 	if($feedmeta->{$f}) {
 	  next;
 	}
 
-	my $pat = $PATTERNS->{'META'}->{$self->{'format'}->{$s_url}}->{$f};
+	my $pat = $PATTERNS->{META}->{$self->{format}->{$s_url}}->{$f};
 	($feedmeta->{$f}) = $blk =~ /$pat/smx;
       }
 
-      my $pat = $PATTERNS->{'ENTRIES'}->{$self->{'format'}->{$s_url}};
+      my $pat = $PATTERNS->{ENTRIES}->{$self->{format}->{$s_url}};
       if(!$pat) {
-	carp qq(No pattern defined for url=$s_url fmt=@{[$self->{'format'}->{$s_url}||'unknown']});
+	carp qq(No pattern defined for url=$s_url fmt=@{[$self->{format}->{$s_url}||'unknown']});
 	return;
       }
 
-      while($self->{'data'}->{$s_url} =~ s/$pat//smx) {
+      while($self->{data}->{$s_url} =~ s/$pat//smx) {
 	$self->_parse_entry($results->{$s_url}, $1);
       }
       return;
     };
   }
 
-  $self->fetch($ref, $opts->{'headers'});
+  $self->fetch($ref, $opts->{headers});
 
   $DEBUG and print {*STDERR} qq(Content retrieved\n);
 
-  $self->{'results'} = $results;
+  $self->{results} = $results;
   return $results;
 }
 
@@ -273,28 +273,28 @@ sub meta {
   }
 
   if($feed) {
-    return $self->{'feedmeta'}->{$feed}||{};
+    return $self->{feedmeta}->{$feed}||{};
   }
 
-  return $self->{'feedmeta'}||{};
+  return $self->{feedmeta}||{};
 }
 
 sub title {
   my ($self, $feed) = @_;
-  return $self->meta($feed)->{'title'} || 'Untitled';
+  return $self->meta($feed)->{title} || 'Untitled';
 }
 
 sub fetch {
   my ($self, $url_ref, $headers) = @_;
-  $self->{'ua'}                ||= XML::FeedLite::UserAgent->new(
-								 'http_proxy' => $self->http_proxy(),
-								);
-  $self->{'ua'}->initialize();
-  $self->{'ua'}->max_req($self->max_req()||$MAX_REQ);
-  $self->{'statuscodes'}          = {};
-  $headers                      ||= {};
-  if($ENV{'HTTP_X_FORWARDED_FOR'}) {
-    $headers->{'X-Forwarded-For'} ||= $ENV{'HTTP_X_FORWARDED_FOR'};
+  $self->{ua} ||= XML::FeedLite::UserAgent->new(
+						http_proxy => $self->http_proxy(),
+					       );
+  $self->{ua}->initialize();
+  $self->{ua}->max_req($self->max_req()||$MAX_REQ);
+  $self->{statuscodes}          = {};
+  $headers                    ||= {};
+  if($ENV{HTTP_X_FORWARDED_FOR}) {
+    $headers->{'X-Forwarded-For'} ||= $ENV{HTTP_X_FORWARDED_FOR};
   }
 
   for my $url (keys %{$url_ref}) {
@@ -311,17 +311,17 @@ sub fetch {
       $headers->proxy_authorization_basic($self->proxy_user(), $self->proxy_pass());
     }
 
-    my $response = $self->{'ua'}->register(HTTP::Request->new('GET', $url, $headers),
-					   $url_ref->{$url},
-					   $BLK_SIZE);
+    my $response = $self->{ua}->register(HTTP::Request->new('GET', $url, $headers),
+					 $url_ref->{$url},
+					 $BLK_SIZE);
     if($response) {
-      $self->{'statuscodes'}->{$url} ||= $response->status_line();
+      $self->{statuscodes}->{$url} ||= $response->status_line();
     }
   }
 
   $DEBUG and print {*STDERR} qq(Requests submitted. Waiting for content\n);
   eval {
-    $self->{'ua'}->wait($self->{'timeout'});
+    $self->{ua}->wait($self->{timeout});
     1;
   } or do {
     if($EVAL_ERROR) {
@@ -334,25 +334,25 @@ sub fetch {
       next;
     }
 
-    $self->{'statuscodes'}->{$url} ||= '200';
+    $self->{statuscodes}->{$url} ||= '200';
   }
   return;
 }
 
 sub statuscodes {
   my ($self, $url)         = @_;
-  $self->{'statuscodes'} ||= {};
+  $self->{statuscodes} ||= {};
 
-  if($self->{'ua'}) {
-    my $uacodes = $self->{'ua'}->statuscodes();
+  if($self->{ua}) {
+    my $uacodes = $self->{ua}->statuscodes();
     for my $k (keys %{$uacodes}) {
       if($uacodes->{$k}) {
-	$self->{'statuscodes'}->{$k} = $uacodes->{$k};
+	$self->{statuscodes}->{$k} = $uacodes->{$k};
       }
     }
   }
 
-  return $url?$self->{'statuscodes'}->{$url}:$self->{'statuscodes'};
+  return $url?$self->{statuscodes}->{$url}:$self->{statuscodes};
 }
 
 sub max_req {
@@ -369,7 +369,7 @@ XML::FeedLite - Perl extension for fetching Atom and RSS feeds with minimal outl
 
 =head1 VERSION
 
-$Revision: 1.8 $
+$Revision: 1.9 $
 
 =head1 SYNOPSIS
 
@@ -385,15 +385,15 @@ under mod_perl. This module requires LWP::Parallel::UserAgent.
 
 =head2 new - Constructor
 
-  my $xfl = XML::FeedLite->new("http://www.atomenabled.org/atom.xml");
+  my $xfl = XML::FeedLite->new('http://www.atomenabled.org/atom.xml');
 
   my $xfl = XML::FeedLite->new([qw(http://www.atomenabled.org/atom.xml
                                    http://slashdot.org/slashdot.rss)]);
 
   my $xfl = XML::FeedLite->new({
-			        'timeout'    => 60,
-                                'url'        => 'http://www.atomenabled.org/atom.xml',
-                                'http_proxy' => 'http://user:pass@webcache.local.com:3128/',
+			        timeout    => 60,
+                                url        => 'http://www.atomenabled.org/atom.xml',
+                                http_proxy => 'http://user:pass@webcache.local.com:3128/',
 			       });
 
  Options can be: url        (optional scalar or array ref, URLs of feeds)

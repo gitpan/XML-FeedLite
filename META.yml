@@ -1,6 +1,6 @@
 ---
 name: XML-FeedLite
-version: 1.008
+version: 1.009
 author:
   - 'Roger M Pettett <rpettett@cpan.org>'
 abstract: 'XML::FeedLite - A simple RSS & Atom feed processor'
@@ -21,7 +21,7 @@ build_requires:
 provides:
   XML::FeedLite:
     file: lib/XML/FeedLite.pm
-    version: 1.008
+    version: 1.009
   XML::FeedLite::File:
     file: lib/XML/FeedLite/File.pm
     version: 1.003
@@ -31,6 +31,9 @@ provides:
   XML::FeedLite::UserAgent:
     file: lib/XML/FeedLite/UserAgent.pm
     version: 1.003
+  XML::FeedLite::UserAgent::proxy:
+    file: lib/XML/FeedLite/UserAgent/proxy.pm
+    version: 1.001
 generated_by: Module::Build version 0.280801
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.2.html
