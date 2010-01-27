@@ -30,7 +30,7 @@ sub fetch {
     close $fh or carp $ERRNO;
 
     my $cb = $url_ref->{$fn};
-    &{$cb}($xml); ## no critic
+    &{$cb}(\$xml); ## no critic
   }
   return;
 }

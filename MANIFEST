@@ -6,8 +6,6 @@ examples/fetch-rdf.pl
 lib/XML/FeedLite.pm
 lib/XML/FeedLite/File.pm
 lib/XML/FeedLite/Normalised.pm
-lib/XML/FeedLite/UserAgent.pm
-lib/XML/FeedLite/UserAgent/proxy.pm
 t/00-critic.t
 t/00-distribution.t
 t/00-pod.t

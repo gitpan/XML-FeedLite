@@ -10,7 +10,7 @@
 package XML::FeedLite;
 use strict;
 use warnings;
-use XML::FeedLite::UserAgent;
+use WWW::Curl::Simple;
 use HTTP::Request;
 use HTTP::Headers;
 use HTML::Entities;
@@ -19,9 +19,9 @@ use English qw(-no_match_vars);
 use Carp;
 use Readonly;
 
-our $VERSION  = do { my @r = (q$Revision: 1.9 $ =~ /\d+/smxg); sprintf '%d.'.'%03d' x $#r, @r };
+our $VERSION  = do { my @r = (q$Revision: 2.0 $ =~ /\d+/smxg); sprintf '%d.'.'%03d' x $#r, @r };
 our $DEBUG    = 0;
-Readonly::Scalar our $BLK_SIZE => 8192;
+
 Readonly::Scalar our $TIMEOUT  => 30;
 Readonly::Scalar our $MAX_REQ  => 5;
 
@@ -171,14 +171,15 @@ sub entries {
     $self->{feedmeta}->{$s_url} = {};
 
     $ref->{$s_url} = sub {
-      my $blk = shift;
+      my $blk_ref = shift;
+      my $blk = ${$blk_ref};
       $self->{data}->{$s_url} .= $blk;
 
       if(!$self->{format}->{$s_url}) {
-	if($blk =~ m{xmlns="https?://[a-z\d\.\-/]+/atom}smix) {
+	if($blk =~ m{xmlns\s*=\s*['"]https?://[a-z\d\.\-/]+/atom}smix) {
 	  $self->{format}->{$s_url} = 'atom';
 
-	} elsif($blk =~ m{xmlns="https?://[a-z\d\.\-/]+/rss}smix) {
+	} elsif($blk =~ m{xmlns\s*=\s*['"]https?://[a-z\d\.\-/]+/rss}smix) {
 	  $self->{format}->{$s_url} = 'rss';
 
 	} elsif($blk =~ m{rss\s+version\s*=\s*"2.0"}smix) {
@@ -286,71 +287,51 @@ sub title {
 
 sub fetch {
   my ($self, $url_ref, $headers) = @_;
-  $self->{ua} ||= XML::FeedLite::UserAgent->new(
-						http_proxy => $self->http_proxy(),
-					       );
-  $self->{ua}->initialize();
-  $self->{ua}->max_req($self->max_req()||$MAX_REQ);
-  $self->{statuscodes}          = {};
-  $headers                    ||= {};
+
+  my $ua = WWW::Curl::Simple->new;
+
+  $self->{'statuscodes'} = {};
+  if(!$headers) {
+    $headers = {};
+  }
+
   if($ENV{HTTP_X_FORWARDED_FOR}) {
-    $headers->{'X-Forwarded-For'} ||= $ENV{HTTP_X_FORWARDED_FOR};
+    $headers->{'X-Forwarded-For'} ||= $ENV{'HTTP_X_FORWARDED_FOR'};
   }
 
   for my $url (keys %{$url_ref}) {
     if(ref $url_ref->{$url} ne 'CODE') {
+      $DEBUG and print {*STDERR} qq[handler for $url isn't CODE];
       next;
     }
-
     $DEBUG and print {*STDERR} qq(Building HTTP::Request for $url [timeout=$self->{'timeout'}] via $url_ref->{$url}\n);
 
-    my $headers  = HTTP::Headers->new(%{$headers});
-    $headers->user_agent($self->user_agent());
+    my $http_headers = HTTP::Headers->new(%{$headers});
+    $http_headers->user_agent($self->user_agent());
 
     if($self->proxy_user() && $self->proxy_pass()) {
       $headers->proxy_authorization_basic($self->proxy_user(), $self->proxy_pass());
     }
 
-    my $response = $self->{ua}->register(HTTP::Request->new('GET', $url, $headers),
-					 $url_ref->{$url},
-					 $BLK_SIZE);
-    if($response) {
-      $self->{statuscodes}->{$url} ||= $response->status_line();
-    }
+    $ua->add_request(HTTP::Request->new('GET', $url, $http_headers));
   }
 
   $DEBUG and print {*STDERR} qq(Requests submitted. Waiting for content\n);
-  eval {
-    $self->{ua}->wait($self->{timeout});
-    1;
-  } or do {
-    if($EVAL_ERROR) {
-      carp $EVAL_ERROR;
-    }
-  };
+  my $ref = $ua->wait;
 
-  for my $url (keys %{$url_ref}) {
-    if(ref $url_ref->{$url} ne 'CODE') {
-      next;
-    }
-
-    $self->{statuscodes}->{$url} ||= '200';
+  for my $curl_req (values %{$ref}) {
+    my $content = $curl_req->body;
+    my $uri     = $curl_req->request->uri;
+    $self->{statuscodes}->{$uri} = $curl_req->head =~ /HTTP\S+\s+(\d+)/smx;
+    $url_ref->{$uri}->($content);
   }
+
   return;
 }
 
 sub statuscodes {
   my ($self, $url)         = @_;
   $self->{statuscodes} ||= {};
-
-  if($self->{ua}) {
-    my $uacodes = $self->{ua}->statuscodes();
-    for my $k (keys %{$uacodes}) {
-      if($uacodes->{$k}) {
-	$self->{statuscodes}->{$k} = $uacodes->{$k};
-      }
-    }
-  }
 
   return $url?$self->{statuscodes}->{$url}:$self->{statuscodes};
 }
@@ -487,6 +468,30 @@ under mod_perl. This module requires LWP::Parallel::UserAgent.
 
 =head1 DEPENDENCIES
 
+=over
+
+=item strict
+
+=item warnings
+
+=item WWW::Curl::Simple
+
+=item HTTP::Request
+
+=item HTTP::Headers
+
+=item HTML::Entities
+
+=item MIME::Base64
+
+=item English
+
+=item Carp
+
+=item Readonly
+
+=back
+
 =head1 INCOMPATIBILITIES
 
 =head1 BUGS AND LIMITATIONS
@@ -497,7 +502,7 @@ Roger Pettett, E<lt>rmp@psyphi.netE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2005 by Roger Pettett
+Copyright (C) 2010 by Roger Pettett
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.4 or,
